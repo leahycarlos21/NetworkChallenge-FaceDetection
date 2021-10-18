@@ -1,25 +1,27 @@
-
-
+from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
+import os
+import optparse
+import socketserver
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+import threading
 
 
-# The port the FTP server will listen on.
-# This must be greater than 1023 unless you run this script as root.
-FTP_PORT = 2121
+def httpServer():
+    HTTP_HOST = 'localhost'
+    HTTP_PORT = 8000
+    HANDLER = SimpleHTTPRequestHandler
+    os.chdir("/home/leahycarlos21/Documents/TEC/II-SEM-2021/RedesDeComutadores/GitHub/NetworkChallenge-FaceDetection/Server/")
+    httpd = socketserver.TCPServer((HTTP_HOST,HTTP_PORT), HANDLER)
+    httpd.serve_forever()
 
-# The name of the FTP user that can log in.
-FTP_USER = "anonymous"
+def ftpServer():
+    FTP_PORT = 2121
+    FTP_USER = "anonymous"
+    FTP_PASSWORD = "anonymous@"
+    FTP_DIRECTORY = "/home/leahycarlos21/Documents/TEC/II-SEM-2021/RedesDeComutadores/GitHub/NetworkChallenge-FaceDetection/Server/raw-images/"
 
-# The FTP user's password.
-FTP_PASSWORD = "anonymous@"
-
-# The directory the FTP user will have full read/write access to.
-FTP_DIRECTORY = "/home/leahycarlos21/Documents/TEC/II-SEM-2021/RedesDeComutadores/GitHub/NetworkChallenge-FaceDetection/Server/raw-images/"
-
-
-def main():
     authorizer = DummyAuthorizer()
 
     # Define a new user having full r/w permissions.
@@ -44,4 +46,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    threading.Thread(target=httpServer).start()
+    threading.Thread(target=ftpServer).start()
+

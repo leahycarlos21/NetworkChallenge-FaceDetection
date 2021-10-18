@@ -5,7 +5,6 @@ FTP_PORT = 2121
 
 ftp = FTP('')
 ftp.connect('localhost',FTP_PORT)
-print("------>")
 ftp.login()
 ftp.cwd('') #replace with your directory
 
@@ -17,11 +16,13 @@ def uploadFile():
  ftp.quit()
 
 def downloadFile():
- filename = 'foticoProcessed.jpeg' #replace with your file in the directory ('directory_name')
+ filename = 'foticoLISTO.jpeg' #replace with your file in the directory ('directory_name')
  localfile = open(filename, 'wb')
  ftp.retrbinary('RETR ' + filename, localfile.write, FTP_PORT)
  ftp.quit()
  localfile.close()
 
-uploadFile()
-#downloadFile()
+#uploadFile()
+downloadFile()
+
+#pip3 install pyftpdlib
