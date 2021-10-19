@@ -7,6 +7,41 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 import threading
 
+class MyHandler(FTPHandler):
+
+    def on_connect(self):
+        print ("%s:%s connected" % (self.remote_ip, self.remote_port))
+
+    def on_disconnect(self):
+        # do something when client disconnects
+        pass
+
+    def on_login(self, username):
+        # do something when user login
+        pass
+
+    def on_logout(self, username):
+        # do something when user logs out
+        pass
+
+    def on_file_sent(self, file):
+        # do something when a file has been sent
+        print("LUIS SE LA COME sent \n")
+        pass
+
+    def on_file_received(self, file):
+        # do something when a file has been received
+        print("LUIS SE LA COME received \n")
+        pass
+
+    def on_incomplete_file_sent(self, file):
+        # do something when a file is partially sent
+        pass
+
+    def on_incomplete_file_received(self, file):
+        # remove partially uploaded files
+        import os
+        os.remove(file)
 
 def httpServer():
     HTTP_HOST = 'localhost'
@@ -27,11 +62,11 @@ def ftpServer():
     # Define a new user having full r/w permissions.
     authorizer.add_user(FTP_USER, FTP_PASSWORD, FTP_DIRECTORY, perm='elradfmw')
 
-    handler = FTPHandler
+    handler = MyHandler
     handler.authorizer = authorizer
 
     # Define a customized banner (string returned when client connects)
-    handler.banner = "pyftpdlib based ftpd ready."
+  #  handler.banner = "pyftpdlib based ftpd ready."
 
     # Optionally specify range of ports to use for passive connections.
     #handler.passive_ports = range(60000, 65535)
