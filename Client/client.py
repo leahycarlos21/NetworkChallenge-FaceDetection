@@ -11,7 +11,7 @@ ftp.cwd('') #replace with your directory
 ftp.retrlines('LIST')
 
 def uploadFile():
- filename = 'fotico.jpeg' #replace with your file in your home folder
+ filename = 'amigos.jpg' #replace with your file in your home folder
  ftp.storbinary('STOR '+filename, open(filename, 'rb'))
  ftp.quit()
 

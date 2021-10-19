@@ -6,6 +6,9 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 import threading
+from fdlite import FaceDetection, FaceDetectionModel
+from fdlite.render import Colors, detections_to_render_data, render_to_image 
+from PIL import Image
 
 class MyHandler(FTPHandler):
 
@@ -31,9 +34,18 @@ class MyHandler(FTPHandler):
 
     def on_file_received(self, file):
         # do something when a file has been received
-        print("LUIS SE LA COME received \n")
-        pass
-
+        
+        image = Image.open(str(file))
+        detect_faces = FaceDetection(model_type=FaceDetectionModel.BACK_CAMERA)
+        faces = detect_faces(image)
+        if not len(faces):
+            print('no faces detected :(')
+        else:
+            render_data = detections_to_render_data(faces, bounds_color=Colors.GREEN)
+            newImage = render_to_image(render_data, image)
+            fileName =  os.path.basename(str(file))
+            newImage.save('/home/racso/NetworkChallenge-FaceDetection/Server/raw-images/' + fileName)
+        
     def on_incomplete_file_sent(self, file):
         # do something when a file is partially sent
         pass
@@ -47,7 +59,7 @@ def httpServer():
     HTTP_HOST = 'localhost'
     HTTP_PORT = 8000
     HANDLER = SimpleHTTPRequestHandler
-    os.chdir("/home/leahycarlos21/Documents/TEC/II-SEM-2021/RedesDeComutadores/GitHub/NetworkChallenge-FaceDetection/Server/")
+    os.chdir("/home/racso/NetworkChallenge-FaceDetection/Server/")
     httpd = socketserver.TCPServer((HTTP_HOST,HTTP_PORT), HANDLER)
     httpd.serve_forever()
 
@@ -55,7 +67,7 @@ def ftpServer():
     FTP_PORT = 2121
     FTP_USER = "anonymous"
     FTP_PASSWORD = "anonymous@"
-    FTP_DIRECTORY = "/home/leahycarlos21/Documents/TEC/II-SEM-2021/RedesDeComutadores/GitHub/NetworkChallenge-FaceDetection/Server/raw-images/"
+    FTP_DIRECTORY = "/home/racso/NetworkChallenge-FaceDetection/Server/raw-images/"
 
     authorizer = DummyAuthorizer()
 
