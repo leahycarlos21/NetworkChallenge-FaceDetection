@@ -9,6 +9,9 @@ import threading
 from fdlite import FaceDetection, FaceDetectionModel
 from fdlite.render import Colors, detections_to_render_data, render_to_image 
 from PIL import Image
+import shutil
+
+DIRECTORY =  os.getcwd()
 
 class MyHandler(FTPHandler):
 
@@ -44,7 +47,9 @@ class MyHandler(FTPHandler):
             render_data = detections_to_render_data(faces, bounds_color=Colors.GREEN)
             newImage = render_to_image(render_data, image)
             fileName =  os.path.basename(str(file))
-            newImage.save('/home/racso/NetworkChallenge-FaceDetection/Server/raw-images/' + fileName)
+            newImage.save(DIRECTORY+"/processed-images/processed-"+fileName)
+            shutil.move(file, DIRECTORY+"/raw-images/"+fileName)
+        
         
     def on_incomplete_file_sent(self, file):
         # do something when a file is partially sent
@@ -59,7 +64,7 @@ def httpServer():
     HTTP_HOST = 'localhost'
     HTTP_PORT = 8000
     HANDLER = SimpleHTTPRequestHandler
-    os.chdir("/home/racso/NetworkChallenge-FaceDetection/Server/")
+    os.chdir(DIRECTORY)
     httpd = socketserver.TCPServer((HTTP_HOST,HTTP_PORT), HANDLER)
     httpd.serve_forever()
 
@@ -67,12 +72,11 @@ def ftpServer():
     FTP_PORT = 2121
     FTP_USER = "anonymous"
     FTP_PASSWORD = "anonymous@"
-    FTP_DIRECTORY = "/home/racso/NetworkChallenge-FaceDetection/Server/raw-images/"
 
     authorizer = DummyAuthorizer()
 
     # Define a new user having full r/w permissions.
-    authorizer.add_user(FTP_USER, FTP_PASSWORD, FTP_DIRECTORY, perm='elradfmw')
+    authorizer.add_user(FTP_USER, FTP_PASSWORD, DIRECTORY, perm='elradfmw')
 
     handler = MyHandler
     handler.authorizer = authorizer
