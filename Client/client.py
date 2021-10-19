@@ -1,5 +1,5 @@
 from ftplib import FTP
-
+import requests
 
 FTP_PORT = 2121
 
@@ -7,7 +7,6 @@ ftp = FTP('')
 ftp.connect('localhost',FTP_PORT)
 ftp.login()
 ftp.cwd('') #replace with your directory
-
 ftp.retrlines('LIST')
 
 def uploadFile():
@@ -22,7 +21,17 @@ def downloadFile():
  ftp.quit()
  localfile.close()
 
+def check_file():
+    print("Work")
+    r = requests.post('http://localhost:23336/api/checkimage', json={"imname": "processed-amigos.jpg"})
+    r.status_code
+    print(r.json())
+    #JSON
+    y = r.json()
+    print(y["status"]) 
+
+
+
 uploadFile()
 #downloadFile()
-
-#pip3 install pyftpdlib
+#check_file()
