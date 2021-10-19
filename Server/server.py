@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
 import os
+import os.path
+from os import path
 import optparse
 import socketserver
 from pyftpdlib.authorizers import DummyAuthorizer
@@ -10,9 +12,16 @@ from fdlite import FaceDetection, FaceDetectionModel
 from fdlite.render import Colors, detections_to_render_data, render_to_image 
 from PIL import Image
 import shutil
+import re
+import flask
+from flask import request, jsonify
 
 DIRECTORY =  os.getcwd()
 
+host_name_http = "localhost"
+port_http = 23336
+
+################################################# FTP ##############################################
 class MyHandler(FTPHandler):
 
     def on_connect(self):
@@ -32,7 +41,6 @@ class MyHandler(FTPHandler):
 
     def on_file_sent(self, file):
         # do something when a file has been sent
-        print("LUIS SE LA COME sent \n")
         pass
 
     def on_file_received(self, file):
@@ -59,14 +67,6 @@ class MyHandler(FTPHandler):
         # remove partially uploaded files
         import os
         os.remove(file)
-
-def httpServer():
-    HTTP_HOST = 'localhost'
-    HTTP_PORT = 8000
-    HANDLER = SimpleHTTPRequestHandler
-    os.chdir(DIRECTORY)
-    httpd = socketserver.TCPServer((HTTP_HOST,HTTP_PORT), HANDLER)
-    httpd.serve_forever()
 
 def ftpServer():
     FTP_PORT = 2121
@@ -95,8 +95,32 @@ def ftpServer():
 
     server.serve_forever()
 
+############################################## FLASK API ###########################################
+app = flask.Flask(__name__)
+app.config["DEBUG"] = True
 
+@app.route('/', methods=['GET'])
+def home():
+    return '''<h1>Distant Reading Archive</h1>
+<p>A prototype API for distant reading of science fiction novels.</p>'''
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+
+@app.route('/api/checkimage', methods=['POST'])
+def api_check_image():
+    req_JSON = request.json
+    imname = req_JSON['imname']
+    exists = path.exists("processed-images/"+imname)
+    return jsonify({'response': "imname: "+imname,
+                    'status':exists})
+    
+
+
+
+
+###################################################### MAIN ###############################################
 if __name__ == '__main__':
-    threading.Thread(target=httpServer).start()
     threading.Thread(target=ftpServer).start()
-
+    threading.Thread(target=lambda: app.run(host=host_name_http, port=port_http, debug=True, use_reloader=False)).start()
