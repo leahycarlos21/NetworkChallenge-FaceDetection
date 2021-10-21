@@ -3,8 +3,9 @@ import requests
 
 FTP_PORT = 2121
 
+
 ftp = FTP('')
-ftp.connect('localhost',FTP_PORT)
+ftp.connect('http://eba1-186-176-104-13.ngrok.io/')
 ftp.login()
 ftp.cwd('') #replace with your directory
 ftp.retrlines('LIST')
@@ -23,7 +24,7 @@ def downloadFile():
 
 def check_file():
     print("Work")
-    r = requests.post('http://localhost:23336/api/checkimage', json={"imname": "processed-amigos.jpg"})
+    r = requests.post('http://1292-186-176-104-13.ngrok.io/api/checkimage', json={"imname": "processed-amigos.jpg"})
     r.status_code
     print(r.json())
     #JSON
