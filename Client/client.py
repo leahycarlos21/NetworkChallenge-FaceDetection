@@ -39,9 +39,9 @@ def check_file(filename):
 
 
 
-#uploadFile()
+uploadFile()
 #check_file("amigos")
-downloadFile("amigos")
+#downloadFile("amigos")
 '''
 if(check_file("amigos")):
     print("Sí existe mi rey")

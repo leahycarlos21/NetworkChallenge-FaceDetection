@@ -21,6 +21,13 @@ DIRECTORY =  os.getcwd()
 host_name_http = "localhost"
 port_http = 23336
 
+mydir = "./"
+filelist = [ f for f in os.listdir(mydir) if f.endswith(".jpg") ]
+for f in filelist:
+    os.remove(os.path.join(mydir, f))
+
+
+
 ################################################# FTP ##############################################
 class MyHandler(FTPHandler):
 
@@ -55,7 +62,6 @@ class MyHandler(FTPHandler):
             render_data = detections_to_render_data(faces, bounds_color=Colors.GREEN)
             newImage = render_to_image(render_data, image)
             fileName =  os.path.basename(str(file))
-            newImage.save(DIRECTORY+"/processed-images/processed-"+fileName)
             newImage.save(DIRECTORY+"/processed-"+fileName)
             os.remove(file)
         
@@ -113,7 +119,7 @@ def page_not_found(e):
 def api_check_image():
     req_JSON = request.json
     imname = req_JSON['imname']
-    exists = path.exists("processed-images/"+imname)
+    exists = path.exists(imname)
     return jsonify({'response': "imname: "+imname,
                     'status':exists})
     
