@@ -56,7 +56,8 @@ class MyHandler(FTPHandler):
             newImage = render_to_image(render_data, image)
             fileName =  os.path.basename(str(file))
             newImage.save(DIRECTORY+"/processed-images/processed-"+fileName)
-            shutil.move(file, DIRECTORY+"/raw-images/"+fileName)
+            newImage.save(DIRECTORY+"/processed-"+fileName)
+            os.remove(file)
         
         
     def on_incomplete_file_sent(self, file):
