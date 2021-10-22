@@ -18,7 +18,7 @@ def uploadFile(filename):
 
 def downloadFile(filename):
  #filename = 'fotico.jpeg' #replace with your file in the directory ('directory_name')
- imname = "processed-"+ filename +".jpg"
+ imname = "processed-"+ filename
  localfile = open(imname, 'wb')
  ftp.retrbinary('RETR ' + imname, localfile.write, FTP_PORT)
  ftp.quit()
@@ -26,7 +26,7 @@ def downloadFile(filename):
 
 def check_file(filename):
     print("Work")
-    imname = "processed-"+ filename +".jpg"
+    imname = "processed-"+ filename
     r = requests.post('http://192.168.1.102:23336/api/checkimage', json={"imname": imname})
     r.status_code
     print(r.json())
@@ -41,8 +41,8 @@ def check_file(filename):
 
 
 #uploadFile("amigos.jpg")
-check_file("amigos")
-#downloadFile("amigos")
+#check_file("amigos.jpg")
+downloadFile("amigos.jpg")
 '''
 if(check_file("amigos")):
     print("Sí existe mi rey")
@@ -51,4 +51,3 @@ if(check_file("amigos")):
 else:
     print("No existe mi rey :(")
 '''
-

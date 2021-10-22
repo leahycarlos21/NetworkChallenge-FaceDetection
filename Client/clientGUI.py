@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QDialog,QFileDialog, QApplication,QScrollArea
 import sys
 import os
 import requests
-
+import shutil 
 
 class ApplicationScreen(QDialog):
 
@@ -40,8 +40,9 @@ class ApplicationScreen(QDialog):
 
     def setCurrentPath(self, currentPath):
         self.pathLabel.setText(currentPath)
-        cmd = "cp {0} ~/NetworkChallenge-FaceDetection/Client/".format(currentPath) 
-        os.system(cmd) 
+        #cmd = "cp {0} ~/NetworkChallenge-FaceDetection/Client/".format(currentPath)
+        dest = shutil.move(currentPath, os.getcwd())
+        #os.system(cmd) 
         pathList = currentPath.split("/")
         self.currentFileName = pathList[-1]
         self.imageTable.setItem(self.iCounter,self.jCounter,QtWidgets.QTableWidgetItem(self.currentFileName))
