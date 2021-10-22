@@ -1,11 +1,11 @@
 from ftplib import FTP
 import requests
+import time
 
 FTP_PORT = 2121
 
-
 ftp = FTP('')
-ftp.connect('http://eba1-186-176-104-13.ngrok.io/')
+ftp.connect('localhost',FTP_PORT)
 ftp.login()
 ftp.cwd('') #replace with your directory
 ftp.retrlines('LIST')
@@ -15,24 +15,39 @@ def uploadFile():
  ftp.storbinary('STOR '+filename, open(filename, 'rb'))
  ftp.quit()
 
-def downloadFile():
- filename = 'fotico.jpeg' #replace with your file in the directory ('directory_name')
- localfile = open(filename, 'wb')
- ftp.retrbinary('RETR ' + filename, localfile.write, FTP_PORT)
+def downloadFile(filename):
+ #filename = 'fotico.jpeg' #replace with your file in the directory ('directory_name')
+ imname = "processed-"+ filename +".jpg"
+ localfile = open(imname, 'wb')
+ ftp.retrbinary('RETR ' + imname, localfile.write, FTP_PORT)
  ftp.quit()
  localfile.close()
 
-def check_file():
+def check_file(filename):
     print("Work")
-    r = requests.post('http://1292-186-176-104-13.ngrok.io/api/checkimage', json={"imname": "processed-amigos.jpg"})
+    imname = "processed-"+ filename +".jpg"
+    r = requests.post('http://localhost:23336/api/checkimage', json={"imname": imname})
     r.status_code
     print(r.json())
     #JSON
     y = r.json()
-    print(y["status"]) 
+    print(y["status"])
+    if(y["status"]):
+        return True
+    else:
+        return False
 
 
 
-uploadFile()
-#downloadFile()
-#check_file()
+#uploadFile()
+#check_file("amigos")
+downloadFile("amigos")
+'''
+if(check_file("amigos")):
+    print("Sí existe mi rey")
+    #time.sleep(5)
+    downloadFile("amigos")
+else:
+    print("No existe mi rey :(")
+'''
+
