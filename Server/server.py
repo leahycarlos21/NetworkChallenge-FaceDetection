@@ -18,7 +18,7 @@ from flask import request, jsonify
 
 DIRECTORY =  os.getcwd()
 
-host_name_http = "localhost"
+host_name_http = "192.168.1.102"
 port_http = 23336
 
 mydir = "./"
@@ -94,7 +94,7 @@ def ftpServer():
     # Optionally specify range of ports to use for passive connections.
     #handler.passive_ports = range(60000, 65535)
 
-    address = ('localhost', FTP_PORT)
+    address = ('192.168.1.102', FTP_PORT)
     server = FTPServer(address, handler)
 
     server.max_cons = 256
