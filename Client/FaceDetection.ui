@@ -67,7 +67,7 @@ color: rgb(238, 238, 236);</string>
       <x>100</x>
       <y>220</y>
       <width>900</width>
-      <height>81</height>
+      <height>300</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -90,7 +90,7 @@ background-color: rgb(85, 87, 83);</string>
     </column>
     <column>
      <property name="text">
-      <string>Show Image</string>
+      <string>Result Image</string>
      </property>
     </column>
    </widget>
@@ -130,6 +130,19 @@ color: white;</string>
     </property>
     <property name="text">
      <string>Upload Image</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="imageLabel">
+    <property name="geometry">
+     <rect>
+      <x>1040</x>
+      <y>220</y>
+      <width>461</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

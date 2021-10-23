@@ -1,6 +1,6 @@
 from ftplib import FTP
 from PyQt5.uic import loadUi
-from PyQt5 import QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog,QFileDialog, QApplication,QScrollArea
 import sys
@@ -19,8 +19,8 @@ class ApplicationScreen(QDialog):
         self.iCounter = 0
         self.jCounter = 0
         self.ftp = None
+        self.btn_sell = None
         self.setColumnWidthTables()
-        self.setRowCountTables()
         self.selectButton.clicked.connect(self.openFileExplorer)
         self.uploadButton.clicked.connect(self.uploadFile)
 
@@ -34,9 +34,9 @@ class ApplicationScreen(QDialog):
 
     def uploadFile(self):
         filename = self.currentFileName 
-        self.ftp.storbinary('STOR '+filename, open(filename, 'rb'))
-        self.ftp.quit()
-        self.imageTable.setItem(self.iCounter,self.jCounter + 1,QtWidgets.QTableWidgetItem("Image Uploaded...")) 
+        #self.ftp.storbinary('STOR '+filename, open(filename, 'rb'))
+        #self.ftp.quit()
+        self.imageTable.setItem(self.iCounter - 1,self.jCounter + 1,QtWidgets.QTableWidgetItem("Image Uploaded...")) 
 
     def setCurrentPath(self, currentPath):
         self.pathLabel.setText(currentPath)
@@ -45,19 +45,33 @@ class ApplicationScreen(QDialog):
         #os.system(cmd) 
         pathList = currentPath.split("/")
         self.currentFileName = pathList[-1]
+        self.setRowCountTables(self.iCounter + 1)
         self.imageTable.setItem(self.iCounter,self.jCounter,QtWidgets.QTableWidgetItem(self.currentFileName))
         self.imageTable.setItem(self.iCounter,self.jCounter + 1,QtWidgets.QTableWidgetItem(""))
-        self.imageTable.setItem(self.iCounter,self.jCounter + 2,QtWidgets.QTableWidgetItem(""))
+        self.btn_sell = QtWidgets.QPushButton('Show')
+        self.btn_sell.clicked.connect(self.handlerButton)
+        self.imageTable.setCellWidget(self.iCounter, self.jCounter + 2, self.btn_sell)
+        self.iCounter += 1
 
     def setColumnWidthTables(self):
         self.imageTable.setColumnWidth(0,300)
         self.imageTable.setColumnWidth(1,300)
         self.imageTable.setColumnWidth(2,300)
 
-    def setRowCountTables(self):
+    def setRowCountTables(self, rowNumber):
         
-        self.imageTable.setRowCount(1)
+        self.imageTable.setRowCount(rowNumber)
+        
+    def handlerButton(self):
 
+        button = self.sender()
+        index = self.imageTable.indexAt(button.pos())
+        if index.isValid():
+            fileName = self.imageTable.item(index.row(),0).text()
+            image = QtGui.QImage('./' + fileName)
+            pixmap = QtGui.QPixmap.fromImage(image)
+            self.imageLabel.setPixmap(pixmap.scaled(461, 321, Qt.KeepAspectRatio))
+        
 
 
 def mainGUI():
@@ -70,40 +84,15 @@ def mainGUI():
     widget.addWidget(scroll)
     widget.setWindowTitle("Face Detection Network Challenge")
     widget.showMaximized()
-    FTP_PORT = 2121
-    ftp = FTP('')
-    ftp.connect('localhost',FTP_PORT)
-    ftp.login()
-    ftp.cwd('') #replace with your directory
-    ftp.retrlines('LIST')
-    GUI.setFTP(ftp)
+    #FTP_PORT = 2121
+    #ftp = FTP('')
+    #ftp.connect('localhost',FTP_PORT)
+    #ftp.login()
+    #ftp.cwd('') #replace with your directory
+    #ftp.retrlines('LIST')
+    #GUI.setFTP(ftp)
     sys.exit(app.exec())
 
-
-
-"""
-
-def downloadFile():
- filename = 'fotico.jpeg' #replace with your file in the directory ('directory_name')
- localfile = open(filename, 'wb')
- ftp.retrbinary('RETR ' + filename, localfile.write, FTP_PORT)
- ftp.quit()
- localfile.close()
-
-def check_file():
-    print("Work")
-    r = requests.post('http://localhost:23336/api/checkimage', json={"imname": "processed-amigos.jpg"})
-    r.status_code
-    print(r.json())
-    #JSON
-    y = r.json()
-    print(y["status"]) 
-
-
-#downloadFile()
-#check_file()
-
-"""
 
 if __name__ == "__main__":
     mainGUI()
