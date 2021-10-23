@@ -21,6 +21,7 @@ class ApplicationScreen(QDialog):
         self.iCounter = 0
         self.jCounter = 0
         self.ftp = None
+        self.FTP_PORT = 0
         self.btn_sell = None
         self.btn_sell2 = None
         self.setColumnWidthTables()
@@ -31,7 +32,10 @@ class ApplicationScreen(QDialog):
 
     def setFTP(self, newFtp):
         self.ftp = newFtp
-
+        
+    def setFTP_PORT(self, newFTP_PORT):
+        self.FTP_PORT = newFTP_PORT
+        
     def openFileExplorer(self):
         path = QFileDialog.getOpenFileName(self, 'Open a file', '','All Files (*.*)')
         if path != ('', ''):
@@ -39,8 +43,8 @@ class ApplicationScreen(QDialog):
 
     def uploadFile(self):
         filename = self.currentFileName 
-        #self.ftp.storbinary('STOR '+filename, open(filename, 'rb'))
-        #self.ftp.quit()
+        self.ftp.storbinary('STOR '+ filename, open(filename, 'rb'))
+        self.ftp.quit()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
         self.cfThread = checkFileThread()
         self.cfThread.started.connect(self.checkFile)
@@ -49,9 +53,7 @@ class ApplicationScreen(QDialog):
 
     def setCurrentPath(self, currentPath):
         self.pathLabel.setText(currentPath)
-        #cmd = "cp {0} ~/NetworkChallenge-FaceDetection/Client/".format(currentPath)
         dest = shutil.move(currentPath, os.getcwd())
-        #os.system(cmd) 
         pathList = currentPath.split("/")
         self.currentFileName = pathList[-1]
         self.setRowCountTables(self.iCounter + 1)
@@ -96,16 +98,32 @@ class ApplicationScreen(QDialog):
     def checkFile(self):
         
         status = False
+        imname = "processed-"+ self.currentFileName
         
         while not status :
+            r = requests.post('http://192.168.1.102:23336/api/checkimage', json={"imname": imname})
+            r.status_code
             time.sleep(2)
-            status = True
-            
+            print(r.json())
+            y = r.json()
+            print(y["status"])
+            if(y["status"]):
+                status = True
+        
+        self.downloadFile()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Ready!"))
         self.btn_sell2 = QtWidgets.QPushButton('Show')
         self.btn_sell2.clicked.connect(self.handlerButton2)
         self.imageTable.setCellWidget(self.iCounter - 1, self.jCounter + 3, self.btn_sell2)
         self.cfThread.stopThread()
+        
+        
+    def downloadFile(self):
+        imname = "processed-"+ self.currentFileName
+        localfile = open(imname, 'wb')
+        self.ftp.retrbinary('RETR ' + imname, localfile.write, self.FTP_PORT)
+        self.ftp.quit()
+        localfile.close()
         
  
 class checkFileThread(QThread):
@@ -117,11 +135,6 @@ class checkFileThread(QThread):
     def stopThread(self):
         self.terminate()       
     
-            
-            
-            
-        
-
 
 def mainGUI():
     app = QApplication(sys.argv)
@@ -133,13 +146,14 @@ def mainGUI():
     widget.addWidget(scroll)
     widget.setWindowTitle("Face Detection Network Challenge")
     widget.showMaximized()
-    #FTP_PORT = 2121
-    #ftp = FTP('')
-    #ftp.connect('localhost',FTP_PORT)
-    #ftp.login()
-    #ftp.cwd('') #replace with your directory
-    #ftp.retrlines('LIST')
-    #GUI.setFTP(ftp)
+    FTP_PORT = 2121
+    ftp = FTP('')
+    ftp.connect('192.168.1.102',FTP_PORT)
+    ftp.login()
+    ftp.cwd('') #replace with your directory
+    ftp.retrlines('LIST')
+    GUI.setFTP(ftp)
+    GUI.setFTP_PORT(FTP_PORT)
     sys.exit(app.exec())
 
 
