@@ -44,7 +44,7 @@ class ApplicationScreen(QDialog):
     def uploadFile(self):
         filename = self.currentFileName 
         self.ftp.storbinary('STOR '+ filename, open(filename, 'rb'))
-        self.ftp.quit()
+        #self.ftp.quit()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
         self.cfThread = checkFileThread()
         self.cfThread.started.connect(self.checkFile)
@@ -53,7 +53,7 @@ class ApplicationScreen(QDialog):
 
     def setCurrentPath(self, currentPath):
         self.pathLabel.setText(currentPath)
-        dest = shutil.move(currentPath, os.getcwd())
+        dest = shutil.copy(currentPath, os.getcwd())
         pathList = currentPath.split("/")
         self.currentFileName = pathList[-1]
         self.setRowCountTables(self.iCounter + 1)
@@ -109,7 +109,7 @@ class ApplicationScreen(QDialog):
             print(y["status"])
             if(y["status"]):
                 status = True
-        
+        print("VA a descargar \n")
         self.downloadFile()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Ready!"))
         self.btn_sell2 = QtWidgets.QPushButton('Show')
@@ -122,7 +122,7 @@ class ApplicationScreen(QDialog):
         imname = "processed-"+ self.currentFileName
         localfile = open(imname, 'wb')
         self.ftp.retrbinary('RETR ' + imname, localfile.write, self.FTP_PORT)
-        self.ftp.quit()
+        #self.ftp.quit()
         localfile.close()
         
  
