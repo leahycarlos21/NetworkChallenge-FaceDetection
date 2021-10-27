@@ -20,7 +20,6 @@ class ApplicationScreen(QDialog):
         self.currentFileName = ""
         self.iCounter = 0
         self.jCounter = 0
-        self.ftp = None
         self.FTP_PORT = 0
         self.btn_sell = None
         self.btn_sell2 = None
@@ -28,10 +27,6 @@ class ApplicationScreen(QDialog):
         self.selectButton.clicked.connect(self.openFileExplorer)
         self.uploadButton.clicked.connect(self.uploadFile)
         
-
-
-    def setFTP(self, newFtp):
-        self.ftp = newFtp
         
     def setFTP_PORT(self, newFTP_PORT):
         self.FTP_PORT = newFTP_PORT
@@ -42,9 +37,10 @@ class ApplicationScreen(QDialog):
             self.setCurrentPath(path[0])
 
     def uploadFile(self):
-        filename = self.currentFileName 
-        self.ftp.storbinary('STOR '+ filename, open(filename, 'rb'))
-        #self.ftp.quit()
+        filename = self.currentFileName
+        FTP = ftpServer()
+        FTP.storbinary('STOR '+ filename, open(filename, 'rb')) 
+        FTP.stopServer()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
         self.cfThread = checkFileThread()
         self.cfThread.started.connect(self.checkFile)
@@ -121,8 +117,9 @@ class ApplicationScreen(QDialog):
     def downloadFile(self):
         imname = "processed-"+ self.currentFileName
         localfile = open(imname, 'wb')
-        self.ftp.retrbinary('RETR ' + imname, localfile.write, self.FTP_PORT)
-        #self.ftp.quit()
+        FTP = ftpServer()
+        FTP.retrbinary('RETR ' + imname, localfile.write, self.FTP_PORT)
+        FTP.stopServer()
         localfile.close()
         
  
@@ -133,7 +130,21 @@ class checkFileThread(QThread):
          
          
     def stopThread(self):
-        self.terminate()       
+        self.terminate()
+        
+class ftpServer(FTP):
+    
+    def __init__(self, port):
+        FTP.__init__(self, '')
+        self.connect('192.168.1.102', port)
+        self.login()
+        self.cwd('')
+        self.retrlines('LIST')
+        
+    def stopServer(self):
+        self.quit()
+        
+        
     
 
 def mainGUI():
@@ -147,12 +158,6 @@ def mainGUI():
     widget.setWindowTitle("Face Detection Network Challenge")
     widget.showMaximized()
     FTP_PORT = 2121
-    ftp = FTP('')
-    ftp.connect('192.168.1.102',FTP_PORT)
-    ftp.login()
-    ftp.cwd('') #replace with your directory
-    ftp.retrlines('LIST')
-    GUI.setFTP(ftp)
     GUI.setFTP_PORT(FTP_PORT)
     sys.exit(app.exec())
 
