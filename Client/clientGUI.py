@@ -9,8 +9,9 @@ import requests
 import shutil 
 import time
 
+IP_SERVER = '192.168.1.102'
+
 class ApplicationScreen(QDialog):
-    
 
     def __init__(self):
 
@@ -40,7 +41,8 @@ class ApplicationScreen(QDialog):
     def uploadFile(self):
         filename = self.currentFileName
         FTP = ftpServer(self.FTP_PORT)
-        FTP.storbinary('STOR '+ filename, open(filename, 'rb')) 
+        FTP.storbinary('STOR '+ filename, open(filename, 'rb'))
+        FTP.stopServer()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
         self.cfThread = checkFileThread()
         self.cfThread.started.connect(self.checkFile)
