@@ -21,6 +21,7 @@ class ApplicationScreen(QDialog):
         self.iCounter = 0
         self.jCounter = 0
         self.FTP_PORT = 0
+        self.currentFTP = None
         self.btn_sell = None
         self.btn_sell2 = None
         self.setColumnWidthTables()
@@ -40,7 +41,6 @@ class ApplicationScreen(QDialog):
         filename = self.currentFileName
         FTP = ftpServer(self.FTP_PORT)
         FTP.storbinary('STOR '+ filename, open(filename, 'rb')) 
-        FTP.stopServer()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
         self.cfThread = checkFileThread()
         self.cfThread.started.connect(self.checkFile)
