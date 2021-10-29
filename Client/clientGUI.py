@@ -38,7 +38,7 @@ class ApplicationScreen(QDialog):
 
     def uploadFile(self):
         filename = self.currentFileName
-        FTP = ftpServer()
+        FTP = ftpServer(self.FTP_PORT)
         FTP.storbinary('STOR '+ filename, open(filename, 'rb')) 
         FTP.stopServer()
         self.imageTable.setItem(self.iCounter - 1,self.jCounter + 2,QtWidgets.QTableWidgetItem("Image Uploaded..."))
@@ -117,7 +117,7 @@ class ApplicationScreen(QDialog):
     def downloadFile(self):
         imname = "processed-"+ self.currentFileName
         localfile = open(imname, 'wb')
-        FTP = ftpServer()
+        FTP = ftpServer(self.FTP_PORT)
         FTP.retrbinary('RETR ' + imname, localfile.write, self.FTP_PORT)
         FTP.stopServer()
         localfile.close()
